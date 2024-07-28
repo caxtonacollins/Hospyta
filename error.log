@@ -1,0 +1,38 @@
+
+
+
+export const likeOrDislikePost = async (req: Request, res: Response) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.body.userId;
+    const { action } = req.body; // 'like' or 'dislike'
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    if (action === 'like') {
+      if (post.upvotes.includes(userId)) {
+        post.upvotes = post.upvotes.filter(id => id.toString() !== userId);
+      } else {
+        post.upvotes.push(userId);
+        post.downvotes = post.downvotes.filter(id => id.toString() !== userId);
+      }
+    } else if (action === 'dislike') {
+      if (post.downvotes.includes(userId)) {
+        post.downvotes = post.downvotes.filter(id => id.toString() !== userId);
+      } else {
+        post.downvotes.push(userId);
+        post.upvotes = post.upvotes.filter(id => id.toString() !== userId);
+      }
+    } else {
+      return res.status(400).json({ message: 'Invalid action' });
+    }
+
+    await post.save();
+    res.status(200).json({ message: 'Post vote status updated', post });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};

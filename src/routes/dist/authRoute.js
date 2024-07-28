@@ -1,0 +1,14 @@
+"use strict";
+exports.__esModule = true;
+var express_1 = require("express");
+var authController_1 = require("../controllers/authController");
+var multer_1 = require("../middlewares/multer/multer");
+var router = express_1.Router();
+router.post('/', multer_1["default"].single('profilePicture'), authController_1["default"].createUser);
+router.post("/verify-email", authController_1["default"].verifyEmail);
+router.post("/login", authController_1["default"].login);
+router.post("/checkIfEmailExistAndSendToken", authController_1["default"].checkIfEmailExistAndSendToken);
+router.post("/verifyOtp", authController_1["default"].verifyOtp);
+router.post("/setPassword", authController_1["default"].setPassword);
+router.post("/resendOtp", authController_1["default"].resendOtp);
+exports["default"] = router;

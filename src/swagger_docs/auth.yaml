@@ -1,0 +1,364 @@
+openapi: 3.0.1
+info:
+  title: Authentication API
+  version: 1.0.0
+  description: API documentation for authentication services
+tags:
+  - name: Authentication
+    description: Operations related to user authentication
+paths:
+  /auth:
+    post:
+      tags:
+        - Authentication
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUserResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /auth/verify-email:
+    post:
+      tags:
+        - Authentication
+      summary: Verify email with OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+      responses:
+        '200':
+          description: User verification successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyEmailResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Incorrect password
+        '404':
+          description: User does not exist
+        '500':
+          description: Internal server error
+
+  /auth/checkIfEmailExistAndSendToken:
+    post:
+      tags:
+        - Authentication
+      summary: Check if email exists and send OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckEmailRequest'
+      responses:
+        '200':
+          description: Token sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckEmailResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /auth/verifyOtp:
+    post:
+      tags:
+        - Authentication
+      summary: Verify OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOtpRequest'
+      responses:
+        '200':
+          description: OTP verification successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyOtpResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /auth/setPassword:
+    post:
+      tags:
+        - Authentication
+      summary: Set new password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPasswordRequest'
+      responses:
+        '200':
+          description: Password set successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetPasswordResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /auth/resendOtp:
+    post:
+      tags:
+        - Authentication
+      summary: Resend OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendOtpRequest'
+      responses:
+        '200':
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResendOtpResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    CreateUserRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - userName
+        - number
+        - password
+        - confirmPassword
+      properties:
+        firstName:
+          type: string
+          description: First name of the user
+        lastName:
+          type: string
+          description: Last name of the user
+        email:
+          type: string
+          description: Email address of the user
+        userName:
+          type: string
+          description: Username of the user
+        number:
+          type: string
+          description: Phone number of the user
+        password:
+          type: string
+          description: Password for the account
+        confirmPassword:
+          type: string
+          description: Confirmation of the password
+        profilePicture:
+          type: string
+          format: binary
+          description: Profile picture of the user
+
+    CreateUserResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+
+    VerifyEmailRequest:
+      type: object
+      required:
+        - email
+        - verificationCode
+      properties:
+        email:
+          type: string
+          description: Email address to verify
+        verificationCode:
+          type: string
+          description: Verification code sent to email
+
+    VerifyEmailResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+        message:
+          type: string
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          description: Email address of the user
+        password:
+          type: string
+          description: Password for the account
+
+    LoginResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+        message:
+          type: string
+
+    CheckEmailRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          description: Email address to check and send OTP
+
+    CheckEmailResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+        message:
+          type: string
+
+    VerifyOtpRequest:
+      type: object
+      required:
+        - email
+        - verificationCode
+      properties:
+        email:
+          type: string
+          description: Email address to verify
+        verificationCode:
+          type: string
+          description: Verification code
+
+    VerifyOtpResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+        message:
+          type: string
+
+    SetPasswordRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          description: Email address of the user
+        password:
+          type: string
+          description: New password for the account
+
+    SetPasswordResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+
+    ResendOtpRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          description: Email address to resend OTP
+
+    ResendOtpResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+        message:
+          type: string
+
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        userName:
+          type: string
+        number:
+          type: string
+        verified:
+          type: boolean
+        profilePicture:
+          type: string

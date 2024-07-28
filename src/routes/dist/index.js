@@ -1,0 +1,13 @@
+"use strict";
+exports.__esModule = true;
+var express_1 = require("express");
+var userRoute_1 = require("./userRoute");
+var postRoute_1 = require("./postRoute");
+var authRoute_1 = require("./authRoute");
+var commentRoute_1 = require("./commentRoute");
+var router = express_1["default"].Router();
+router.use('/auth', authRoute_1["default"]);
+router.use('/user', userRoute_1["default"]);
+router.use('/post', postRoute_1["default"]);
+router.use('/comment', commentRoute_1["default"]);
+exports["default"] = router;

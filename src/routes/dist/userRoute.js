@@ -1,0 +1,10 @@
+"use strict";
+exports.__esModule = true;
+var express_1 = require("express");
+var userController_1 = require("../controllers/userController");
+var router = express_1.Router();
+router.get('/', userController_1["default"].getAllUsers);
+router.get('/:id', userController_1["default"].getUserById);
+router.patch('/:id', userController_1["default"].updateUser);
+router["delete"]('/:id', userController_1["default"].deleteUser);
+exports["default"] = router;

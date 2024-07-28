@@ -1,0 +1,325 @@
+openapi: 3.0.0
+info:
+  title: Post API
+  version: 1.0.0
+
+tags:
+  - name: Post
+    description: Operations related to post
+
+paths:
+  /post:
+    get:
+      tags:
+        - Posts
+      summary: Get all posts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
+
+    post:
+      tags:
+        - Posts
+      summary: Create a new post
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+          description: Bearer token for authentication
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                post_images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                content:
+                  type: string
+                category:
+                  type: string
+                  enum: [Kidney, Headache, Stomachache, Leg-Pain, Malaria]
+      responses:
+        201:
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
+
+  /post/{postId}:
+    get:
+      tags:
+        - Posts
+      summary: Get a post by ID
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID of the post to retrieve
+        - in: query
+          name: sortField
+          schema:
+            type: string
+          description: Field to sort comments by
+        - in: query
+          name: sortOrder
+          schema:
+            type: integer
+            enum: [1, -1]
+          description: Order to sort comments by (1 for ascending, -1 for descending)
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+          description: Bearer token for authentication
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
+
+    put:
+      tags:
+        - Posts
+      summary: Update a post by ID
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID of the post to update
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+          description: Bearer token for authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPost'
+      responses:
+        200:
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
+
+    delete:
+      tags:
+        - Posts
+      summary: Delete a post by ID
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID of the post to delete
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+          description: Bearer token for authentication
+      responses:
+        200:
+          description: Post deleted successfully
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
+
+  /post/upvote/{postId}:
+    post:
+      tags:
+        - Posts
+      summary: Upvote a post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID of the post to upvote
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+          description: Bearer token for authentication
+      responses:
+        200:
+          description: Upvote successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
+
+  /post/downvote/{postId}:
+    post:
+      tags:
+        - Posts
+      summary: Downvote a post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID of the post to downvote
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+          description: Bearer token for authentication
+      responses:
+        200:
+          description: Downvote successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        userName:
+          type: string
+        email:
+          type: string
+
+    Comment:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+        content:
+          type: string
+        replies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        dislikes:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Post:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+        title:
+          type: string
+        content:
+          type: string
+        image:
+          type: array
+          items:
+            type: object
+        category:
+          type: string
+          enum: [Kidney, Headache, Stomachache, Leg-Pain, Malaria]
+        upvotes:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        downvotes:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        viewCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    NewPost:
+      type: object
+      properties:
+        userId:
+          type: string
+        content:
+          type: string
+        image:
+          type: string
+        category:
+          type: string
+          enum: [Kidney, Headache, Stomachache, Leg-Pain, Malaria]
+      required:
+        - userId
+        - content
+        - category
